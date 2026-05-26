@@ -284,6 +284,26 @@ body {
   }
 }
 
+@keyframes heroMaskUp {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes heroFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .top-nav {
     transition: none;
@@ -308,6 +328,40 @@ body {
 
   .product-media img {
     transition: none;
+  }
+
+  .cta,
+  .arrow {
+    transition: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-title {
+    clip-path: inset(100% 0 0 0);
+    animation: heroMaskUp 860ms cubic-bezier(0.2, 0.8, 0.2, 1) 120ms both;
+    will-change: clip-path;
+  }
+
+  .hero-tag,
+  .tag-line,
+  .cta {
+    opacity: 0;
+    transform: translateY(12px);
+    animation: heroFadeUp 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    will-change: transform, opacity;
+  }
+
+  .hero-tag {
+    animation-delay: 980ms;
+  }
+
+  .tag-line {
+    animation-delay: 1060ms;
+  }
+
+  .cta {
+    animation-delay: 1140ms;
   }
 }
 
@@ -387,10 +441,22 @@ body {
   text-transform: uppercase;
   box-shadow: 0 12px 18px rgba(0, 0, 0, 0.35);
   cursor: pointer;
+
+  --mx: 0px;
+  --my: 0px;
+  translate: var(--mx) var(--my);
+  transition: translate 120ms ease;
 }
 
 .arrow {
+  display: inline-block;
   font-size: 16px;
+  transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.cta:hover .arrow,
+.cta:focus-visible .arrow {
+  transform: translateX(5px);
 }
 
 .hero-boot {
