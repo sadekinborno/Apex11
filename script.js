@@ -1,10 +1,8 @@
 (() => {
   const prefersReduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
 
-  const heroLayer = document.querySelector(".hero-layer");
   const topNav = document.querySelector(".top-nav");
-
-  if (!heroLayer) return;
+  const heroLayer = document.querySelector(".hero-layer");
 
   let ticking = false;
   let lastY = window.scrollY || 0;
@@ -42,14 +40,16 @@
     }
 
     if (prefersReduced) {
-      heroLayer.style.setProperty("--s", "0");
+      if (heroLayer) heroLayer.style.setProperty("--s", "0");
       return;
     }
 
     // Drive subtle hero motion only for the first part of scrolling.
-    const max = 260;
-    const s = clamp01(y / max);
-    heroLayer.style.setProperty("--s", String(s));
+    if (heroLayer) {
+      const max = 260;
+      const s = clamp01(y / max);
+      heroLayer.style.setProperty("--s", String(s));
+    }
   };
 
   const onScroll = () => {
@@ -84,7 +84,7 @@
   }
 
   // Magnetic hover for the primary CTA
-  const cta = document.querySelector(".cta");
+  const cta = document.querySelector(".cta, .shop-cta");
   const canMagnetize =
     !prefersReduced &&
     !!cta &&

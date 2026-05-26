@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>APEX11 Shop</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600&family=Bebas+Neue&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="top-nav">
+      <div class="nav-pill">
+        <div class="brand">
+          <span class="brand-icon" aria-hidden="true">
+            <svg viewBox="0 0 48 48" role="img" aria-hidden="true">
+              <circle cx="24" cy="24" r="20" fill="none" stroke="currentColor" stroke-width="3" />
+              <path
+                d="M24 12l6 5-2 7h-8l-2-7 6-5zm-8 12l-6 4 4 8 7-2 2-8m14-2l6 4-4 8-7-2-2-8"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </span>
+          <span class="brand-text">APEX11</span>
+        </div>
+
+        <nav class="nav-links" aria-label="Primary">
+          <a href="shop.html" aria-current="page">Shop</a>
+          <a href="#">Men</a>
+          <a href="#">Women</a>
+          <a href="#">Collections</a>
+          <a href="#">About</a>
+        </nav>
+
+        <div class="nav-icons">
+          <button class="icon-button" aria-label="Search">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2" />
+              <path d="M16.5 16.5L21 21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+          </button>
+          <button class="icon-button" aria-label="Account">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2" />
+              <path
+                d="M4 21c1.6-4 5.2-6 8-6s6.4 2 8 6"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+            </svg>
+          </button>
+          <button class="icon-button bag" aria-label="Cart">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M6 8h12l-1 12H7L6 8zm2 0a4 4 0 018 0"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linejoin="round"
+              />
+            </svg>
+            <span class="badge">2</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="shop-hero" aria-label="Featured boots">
+        <div class="container shop-hero-inner">
+          <div class="shop-copy">
+            <div class="shop-kicker">
+              <span class="shop-kicker-line" aria-hidden="true"></span>
+              <span>Featured</span>
+            </div>
+
+            <h1 class="shop-title">S1 BOOTS<br />ELITE FG</h1>
+            <p class="shop-subtitle">Engineered for control.<br />Built to win.</p>
+            <p class="shop-desc">
+              Precision engineered for ultimate touch and explosive performance on firm ground.
+            </p>
+
+            <button class="shop-cta" type="button">Shop now <span class="arrow" aria-hidden="true">&rarr;</span></button>
+
+            <div class="shop-thumbs" aria-label="Product thumbnails">
+              <button class="shop-thumb is-active" type="button" aria-pressed="true">
+                <img src="Images/Shop/S1Boots.png" alt="" loading="lazy" />
+              </button>
+              <button class="shop-thumb" type="button" aria-pressed="false">
+                <img src="Images/Shop/S1Boots.png" alt="" loading="lazy" />
+              </button>
+              <button class="shop-thumb" type="button" aria-pressed="false">
+                <img src="Images/Shop/S1Boots.png" alt="" loading="lazy" />
+              </button>
+              <button class="shop-thumb" type="button" aria-pressed="false">
+                <img src="Images/Shop/S1Boots.png" alt="" loading="lazy" />
+              </button>
+            </div>
+
+            <div class="shop-pager" aria-label="Carousel pagination">
+              <button class="shop-nav" type="button" aria-label="Previous">
+                <span aria-hidden="true">&larr;</span>
+              </button>
+              <div class="shop-progress" aria-hidden="true">
+                <span class="shop-idx">01</span>
+                <span class="shop-bar"></span>
+                <span class="shop-total">05</span>
+              </div>
+              <button class="shop-nav" type="button" aria-label="Next">
+                <span aria-hidden="true">&rarr;</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="shop-visual" aria-label="Boots preview">
+            <img class="shop-boot" src="Images/Shop/S1Boots.png" alt="Orange and black football boots" />
+
+            <div class="shop-callouts" aria-hidden="true">
+              <div class="shop-callout" style="--x: 74%; --y: 22%; --line: 150px">
+                <div class="shop-callout-text">
+                  <div class="shop-callout-title">Precision fit</div>
+                  <div class="shop-callout-sub">Adaptive collar</div>
+                  <div class="shop-callout-desc">Snug fit for locked-in stability.</div>
+                </div>
+              </div>
+
+              <div class="shop-callout" style="--x: 70%; --y: 48%; --line: 170px">
+                <div class="shop-callout-text">
+                  <div class="shop-callout-title">Strike zone</div>
+                  <div class="shop-callout-sub">Textured upper</div>
+                  <div class="shop-callout-desc">Enhanced grip for maximum control.</div>
+                </div>
+              </div>
+
+              <div class="shop-callout" style="--x: 56%; --y: 76%; --line: 190px">
+                <div class="shop-callout-text">
+                  <div class="shop-callout-title">Traction system</div>
+                  <div class="shop-callout-sub">FG stud pattern</div>
+                  <div class="shop-callout-desc">Optimized for speed and agility.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="footer" aria-label="Footer">
+        <div class="container footer-inner">
+          <div class="footer-brand">APEX11</div>
+          <div class="footer-links">
+            <a href="index.html">Home</a>
+            <a href="#">Help</a>
+            <a href="#">Company</a>
+          </div>
+          <div class="footer-copy">© 2026 APEX11</div>
+        </div>
+      </footer>
+    </main>
+
+    <script src="script.js" defer></script>
+  </body>
+</html>
