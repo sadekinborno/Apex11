@@ -8,30 +8,48 @@ import { useCart } from "./CartContext";
 const easeOut = [0.2, 0.8, 0.2, 1];
 const checkoutIdleFrame = "/Animation/checkout_start_end.png";
 const checkoutVideo = "/Animation/checkoutAnim.mp4";
+const sampleShippingForm = {
+  fullName: "Apex Test User",
+  address: "14 Demo Street",
+  city: "Dhaka",
+  zip: "1212",
+  email: "test@apex11.com",
+  phone: "+8801712345678",
+};
+
+const samplePaymentForm = {
+  method: "card", // 'card' | 'mobile' | 'cod'
+  cardName: "Apex Test User",
+  cardNumber: "4242 4242 4242 4242",
+  cardExpiry: "12/28",
+  cardCvv: "123",
+  mobileProvider: "bKash",
+  mobileNumber: "01712345678",
+  mobileTxn: "TXN-123456",
+};
 
 function formatMoney(value) {
   return `$${value.toFixed(0)}`;
 }
 
 export default function CartSheet() {
-  const { items, isOpen, closeCart, subtotal, shipping, total, removeItem, updateQuantity, clearCart } = useCart();
+  const {
+    items,
+    isOpen,
+    closeCart,
+    subtotal,
+    shipping,
+    total,
+    removeItem,
+    updateQuantity,
+    markItemCheckedOut,
+    markAllItemsCheckedOut,
+  } = useCart();
   const [draggingItemKey, setDraggingItemKey] = useState(null);
   const [checkoutState, setCheckoutState] = useState(null);
   const [checkoutStep, setCheckoutStep] = useState("cart");
-  const [shippingForm, setShippingForm] = useState({
-    fullName: "",
-    address: "",
-    city: "",
-    zip: "",
-    email: "",
-    phone: "",
-  });
-  const [paymentForm, setPaymentForm] = useState({
-    method: "mobile", // 'mobile' | 'cod'
-    mobileProvider: "",
-    mobileNumber: "",
-    mobileTxn: "",
-  });
+  const [shippingForm, setShippingForm] = useState(sampleShippingForm);
+  const [paymentForm, setPaymentForm] = useState(samplePaymentForm);
   const checkoutItem = checkoutState?.mode === "item" ? items.find((item) => item.key === checkoutState.itemKey) ?? null : null;
   const isBulkCheckout = checkoutState?.mode === "bulk";
 
@@ -39,7 +57,8 @@ export default function CartSheet() {
     if (!isOpen) {
       setCheckoutState(null);
       setCheckoutStep("cart");
-      setShippingForm({ fullName: "", address: "", city: "", zip: "", email: "", phone: "" });
+      setShippingForm(sampleShippingForm);
+      setPaymentForm(samplePaymentForm);
       return;
     }
 
@@ -91,14 +110,15 @@ export default function CartSheet() {
 
   const finishCheckout = () => {
     if (checkoutState?.mode === "bulk") {
-      clearCart();
+      markAllItemsCheckedOut();
     } else if (checkoutState?.mode === "item") {
-      removeItem(checkoutState.itemKey);
+      markItemCheckedOut(checkoutState.itemKey);
     }
 
     setCheckoutState(null);
     setCheckoutStep("cart");
-    setShippingForm({ fullName: "", address: "", city: "", zip: "", email: "", phone: "" });
+    setShippingForm(sampleShippingForm);
+    setPaymentForm(samplePaymentForm);
   };
 
   const animationKicker = checkoutState
@@ -140,7 +160,12 @@ export default function CartSheet() {
   const isPaymentFilled =
     paymentForm.method === "cod"
       ? true
-      : paymentForm.mobileNumber.trim().length >= 6;
+      : paymentForm.method === "mobile"
+        ? paymentForm.mobileProvider.trim().length > 0 && paymentForm.mobileNumber.trim().length >= 6
+        : paymentForm.cardName.trim().length > 0 &&
+          paymentForm.cardNumber.replace(/\s/g, "").length >= 12 &&
+          paymentForm.cardExpiry.trim().length >= 4 &&
+          paymentForm.cardCvv.trim().length >= 3;
 
   const handlePaymentChange = (field) => (e) => {
     const value = e.target.value;
@@ -334,6 +359,7 @@ export default function CartSheet() {
                                 <div className="cart-name">{item.name}</div>
                                 <div className="cart-variant">
                                   UK {item.size} · {item.colorway}
+                                  {item.checkedOut ? <span className="cart-status-tag">Checked Out</span> : null}
                                 </div>
                                 <button type="button" className="cart-remove-link" onClick={() => removeItem(item.key)}>
                                   Remove
@@ -366,10 +392,14 @@ export default function CartSheet() {
                                   type="button"
                                   className="cart-checkout-button"
                                   onClick={() => handleItemCheckout(item)}
-                                  disabled={Boolean(checkoutState)}
+                                  disabled={Boolean(checkoutState) || item.checkedOut}
                                   aria-label={`Checkout ${item.name}`}
                                 >
-                                  {checkoutState?.mode === "item" && checkoutItem?.key === item.key ? "Loading truck" : "Checkout"}
+                                  {item.checkedOut
+                                    ? "Checked Out"
+                                    : checkoutState?.mode === "item" && checkoutItem?.key === item.key
+                                      ? "Loading truck"
+                                      : "Checkout"}
                                 </button>
                               </div>
                             </motion.div>
@@ -460,7 +490,7 @@ export default function CartSheet() {
                   >
                     <div className="checkout-payment-grid">
                       <div className="checkout-review">
-                        <div className="checkout-payment-kicker">Review order</div>
+                        <div className="checkout-payment-kicker">Order Summary</div>
                         <div className="checkout-payment-list">
                           {items.map((it) => (
                               <div key={it.key} className="checkout-review-row">
@@ -473,15 +503,14 @@ export default function CartSheet() {
                             ))}
                         </div>
 
-                        <div className="checkout-address">
-                          <div className="checkout-payment-kicker">Ship to</div>
-                          <div>
-                            <strong>{shippingForm.fullName}</strong>
-                            <div>{shippingForm.address}</div>
-                            <div>
-                              {shippingForm.city} · {shippingForm.zip}
-                            </div>
-                            <div>{shippingForm.email} · {shippingForm.phone}</div>
+                        <div className="checkout-address-card">
+                          <div className="checkout-payment-kicker" style={{ marginBottom: "8px" }}>Shipping To</div>
+                          <div className="checkout-address-name">{shippingForm.fullName}</div>
+                          <div className="checkout-address-grid">
+                            <div className="checkout-address-item">{shippingForm.address}</div>
+                            <div className="checkout-address-item">{shippingForm.city} · {shippingForm.zip}</div>
+                            <div className="checkout-address-item">{shippingForm.email}</div>
+                            <div className="checkout-address-item">{shippingForm.phone}</div>
                           </div>
                         </div>
                       </div>
@@ -490,53 +519,103 @@ export default function CartSheet() {
                         <div className="checkout-payment-kicker">Payment</div>
 
                         <div className="payment-methods">
-                          <label className="payment-method">
+                          <label className={paymentForm.method === "card" ? "payment-method is-active" : "payment-method"}>
+                            <input
+                              type="radio"
+                              name="payment-method"
+                              checked={paymentForm.method === "card"}
+                              onChange={() => setPaymentForm((cur) => ({ ...cur, method: "card" }))}
+                            />
+                            <div className="payment-method-copy">
+                              <strong>Card</strong>
+                              <span>Visa, Mastercard or local debit card.</span>
+                            </div>
+                          </label>
+
+                          <label className={paymentForm.method === "mobile" ? "payment-method is-active" : "payment-method"}>
                             <input
                               type="radio"
                               name="payment-method"
                               checked={paymentForm.method === "mobile"}
                               onChange={() => setPaymentForm((cur) => ({ ...cur, method: "mobile" }))}
                             />
-                            <span>Mobile Banking</span>
+                            <div className="payment-method-copy">
+                              <strong>Mobile Banking</strong>
+                              <span>bKash, Nagad, Rocket or similar.</span>
+                            </div>
                           </label>
 
-                          <label className="payment-method">
+                          <label className={paymentForm.method === "cod" ? "payment-method is-active" : "payment-method"}>
                             <input
                               type="radio"
                               name="payment-method"
                               checked={paymentForm.method === "cod"}
                               onChange={() => setPaymentForm((cur) => ({ ...cur, method: "cod" }))}
                             />
-                            <span>Cash on Delivery</span>
+                            <div className="payment-method-copy">
+                              <strong>Cash on Delivery</strong>
+                              <span>Pay when your order reaches you.</span>
+                            </div>
                           </label>
                         </div>
 
-                        {paymentForm.method === "mobile" ? (
-                          <>
-                            <label className="checkout-field">
-                              <input type="text" value={paymentForm.mobileProvider} onChange={handlePaymentChange("mobileProvider")} placeholder=" " />
-                              <span>Provider (e.g., MTN MobileMoney)</span>
+                        {paymentForm.method === "card" ? (
+                          <div className="payment-context-panel">
+                            <div className="payment-context-head">
+                              <div className="checkout-payment-kicker">Card details</div>
+                              <span className="payment-context-badge">Secure</span>
+                            </div>
+
+                            <label className="checkout-field checkout-field-wide">
+                              <input type="text" value={paymentForm.cardName} onChange={handlePaymentChange("cardName")} placeholder=" " />
+                              <span>Name on card</span>
                             </label>
 
-                            <label className="checkout-field">
+                            <label className="checkout-field checkout-field-wide">
+                              <input type="text" value={paymentForm.cardNumber} onChange={handlePaymentChange("cardNumber")} placeholder=" " />
+                              <span>Card number</span>
+                            </label>
+
+                            <div className="payment-split-row">
+                              <label className="checkout-field">
+                                <input type="text" value={paymentForm.cardExpiry} onChange={handlePaymentChange("cardExpiry")} placeholder=" " />
+                                <span>Expiry</span>
+                              </label>
+
+                              <label className="checkout-field">
+                                <input type="text" value={paymentForm.cardCvv} onChange={handlePaymentChange("cardCvv")} placeholder=" " />
+                                <span>CVV</span>
+                              </label>
+                            </div>
+                          </div>
+                        ) : paymentForm.method === "mobile" ? (
+                          <div className="payment-context-panel">
+                            <div className="payment-context-head">
+                              <div className="checkout-payment-kicker">Mobile banking</div>
+                              <span className="payment-context-badge">Fast</span>
+                            </div>
+
+                            <label className="checkout-field checkout-field-wide">
+                              <input type="text" value={paymentForm.mobileProvider} onChange={handlePaymentChange("mobileProvider")} placeholder=" " />
+                              <span>Provider</span>
+                            </label>
+
+                            <label className="checkout-field checkout-field-wide">
                               <input type="tel" value={paymentForm.mobileNumber} onChange={handlePaymentChange("mobileNumber")} placeholder=" " />
                               <span>Mobile number</span>
                             </label>
 
-                            <label className="checkout-field">
+                            <label className="checkout-field checkout-field-wide">
                               <input type="text" value={paymentForm.mobileTxn} onChange={handlePaymentChange("mobileTxn")} placeholder=" " />
                               <span>Transaction ID (optional)</span>
                             </label>
-                          </>
+                          </div>
                         ) : (
-                          <div className="checkout-cod-note">Cash on Delivery selected — pay at delivery. Small fee may apply.</div>
+                          <div className="checkout-cod-note checkout-cod-note-hero">
+                            Cash on Delivery selected. Your order will be paid at delivery.
+                          </div>
                         )}
 
-                        <div className="checkout-payment-actions">
-                          <button type="button" className="cart-cta" onClick={handleConfirmPayment} disabled={!isFormFilled || !isPaymentFilled || Boolean(checkoutState) || items.length === 0}>
-                            Confirm dispatch
-                          </button>
-                        </div>
                       </div>
                     </div>
                   </motion.div>
@@ -552,9 +631,14 @@ export default function CartSheet() {
               </div>
 
               {checkoutStep === "cart" ? (
-                <button className="cart-cta" type="button" onClick={goToShipping} disabled={Boolean(checkoutState) || items.length === 0}>
-                  Proceed to checkout
-                </button>
+                <div className="cart-footer-actions">
+                  <button className="cart-cta cart-cta-secondary" type="button" onClick={confirmDispatch} disabled={Boolean(checkoutState) || items.length === 0}>
+                    Checkout all
+                  </button>
+                  <button className="cart-cta" type="button" onClick={goToShipping} disabled={Boolean(checkoutState) || items.length === 0}>
+                    Confirm
+                  </button>
+                </div>
               ) : checkoutStep === "shipping" ? (
                 <button className="cart-cta" type="button" onClick={goToPayment} disabled={!isFormFilled || Boolean(checkoutState)}>
                   Continue to payment

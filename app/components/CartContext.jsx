@@ -18,7 +18,7 @@ export function CartProvider({ children }) {
       );
 
       if (existingIndex === -1) {
-        return [...currentItems, { ...item, quantity: 1 }];
+        return [...currentItems, { ...item, quantity: 1, checkedOut: false }];
       }
 
       return currentItems.map((currentItem, index) =>
@@ -43,6 +43,18 @@ export function CartProvider({ children }) {
     setItems((currentItems) => currentItems.filter((item) => item.key !== itemKey));
   };
 
+  const markItemCheckedOut = (itemKey) => {
+    setItems((currentItems) =>
+      currentItems.map((item) =>
+        item.key === itemKey ? { ...item, checkedOut: true } : item,
+      ),
+    );
+  };
+
+  const markAllItemsCheckedOut = () => {
+    setItems((currentItems) => currentItems.map((item) => ({ ...item, checkedOut: true })));
+  };
+
   const clearCart = () => setItems([]);
 
   const count = items.reduce((sum, item) => sum + item.quantity, 0);
@@ -64,6 +76,8 @@ export function CartProvider({ children }) {
       addItem,
       updateQuantity,
       removeItem,
+      markItemCheckedOut,
+      markAllItemsCheckedOut,
       clearCart,
     }),
     [items, count, subtotal, shipping, total, isOpen],
