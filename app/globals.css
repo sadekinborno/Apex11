@@ -375,7 +375,7 @@ body {
   position: fixed;
   top: 108px;
   bottom: 108px;
-  left: clamp(20px, 2.5vw, 36px);
+  left: clamp(32px, 4vw, 52px);
   right: calc(min(92vw, 420px) + clamp(20px, 2.5vw, 36px));
   z-index: 61;
   pointer-events: none;

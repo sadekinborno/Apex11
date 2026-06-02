@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 import { useCart } from "./CartContext";
@@ -18,7 +18,7 @@ const sampleShippingForm = {
 };
 
 const samplePaymentForm = {
-  method: "card", // 'card' | 'mobile' | 'cod'
+  method: "", // 'card' | 'mobile' | 'cod'
   cardName: "Apex Test User",
   cardNumber: "4242 4242 4242 4242",
   cardExpiry: "12/28",
@@ -50,8 +50,10 @@ export default function CartSheet() {
   const [checkoutStep, setCheckoutStep] = useState("cart");
   const [shippingForm, setShippingForm] = useState(sampleShippingForm);
   const [paymentForm, setPaymentForm] = useState(samplePaymentForm);
+  const paymentInputSectionRef = useRef(null);
   const checkoutItem = checkoutState?.mode === "item" ? items.find((item) => item.key === checkoutState.itemKey) ?? null : null;
   const isBulkCheckout = checkoutState?.mode === "bulk";
+  const hasCheckedOutItems = items.some((item) => item.checkedOut);
 
   useEffect(() => {
     if (!isOpen) {
@@ -66,6 +68,18 @@ export default function CartSheet() {
       setCheckoutState(null);
     }
   }, [checkoutState, isOpen, items]);
+
+  useEffect(() => {
+    if (checkoutStep !== "payment" || paymentForm.method === "cod") {
+      return;
+    }
+
+    const rafId = window.requestAnimationFrame(() => {
+      paymentInputSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    return () => window.cancelAnimationFrame(rafId);
+  }, [checkoutStep, paymentForm.method]);
 
   const handleItemCheckout = (item) => {
     if (checkoutState) {
@@ -560,7 +574,7 @@ export default function CartSheet() {
                         </div>
 
                         {paymentForm.method === "card" ? (
-                          <div className="payment-context-panel">
+                          <div className="payment-context-panel" ref={paymentInputSectionRef}>
                             <div className="payment-context-head">
                               <div className="checkout-payment-kicker">Card details</div>
                               <span className="payment-context-badge">Secure</span>
@@ -589,7 +603,7 @@ export default function CartSheet() {
                             </div>
                           </div>
                         ) : paymentForm.method === "mobile" ? (
-                          <div className="payment-context-panel">
+                          <div className="payment-context-panel" ref={paymentInputSectionRef}>
                             <div className="payment-context-head">
                               <div className="checkout-payment-kicker">Mobile banking</div>
                               <span className="payment-context-badge">Fast</span>
@@ -631,14 +645,14 @@ export default function CartSheet() {
               </div>
 
               {checkoutStep === "cart" ? (
-                <div className="cart-footer-actions">
-                  <button className="cart-cta cart-cta-secondary" type="button" onClick={confirmDispatch} disabled={Boolean(checkoutState) || items.length === 0}>
-                    Checkout all
-                  </button>
-                  <button className="cart-cta" type="button" onClick={goToShipping} disabled={Boolean(checkoutState) || items.length === 0}>
-                    Confirm
-                  </button>
-                </div>
+                <button
+                  className="cart-cta"
+                  type="button"
+                  onClick={hasCheckedOutItems ? goToShipping : confirmDispatch}
+                  disabled={Boolean(checkoutState) || items.length === 0}
+                >
+                  {hasCheckedOutItems ? "Confirm" : "Checkout All"}
+                </button>
               ) : checkoutStep === "shipping" ? (
                 <button className="cart-cta" type="button" onClick={goToPayment} disabled={!isFormFilled || Boolean(checkoutState)}>
                   Continue to payment
